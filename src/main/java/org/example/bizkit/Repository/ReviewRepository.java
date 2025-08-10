@@ -9,7 +9,7 @@ import java.util.List;
 public interface ReviewRepository extends JpaRepository<Review,Integer> {
     Review findReviewById(Integer id);
     List<Review> findReviewsByClientId(Integer id);
-    Review findReviewsByOrderId(Integer id);
+    List<Review> findReviewsByOrderId(Integer id);
     List<Review> findReviewsByProductId(Integer id);
 
     @Query("select r from Review r where r.rating >= ?1")//

@@ -45,12 +45,12 @@ public class ProviderController {
             return ResponseEntity.badRequest().body(errors.getFieldError().getDefaultMessage());
         }
         providerService.addProvider( provider);
-        return ResponseEntity.status(201).body(new ApiResponse("Provider added successfully (pending activation)"));
+        return ResponseEntity.status(201).body(new ApiResponse("ProviderInfoDto added successfully (pending activation)"));
     }
 
     // ===================== PUT =====================
 
-    // Provider updates own data
+    // ProviderInfoDto updates own data
     @PutMapping("/update/{providerId}")
     public ResponseEntity<?> updateProvider(@PathVariable Integer providerId,
                                             @Valid @RequestBody Provider newProvider,
@@ -59,7 +59,7 @@ public class ProviderController {
             return ResponseEntity.badRequest().body(errors.getFieldError().getDefaultMessage());
         }
         providerService.updateProvider(providerId, newProvider);
-        return ResponseEntity.ok(new ApiResponse("Provider updated successfully"));
+        return ResponseEntity.ok(new ApiResponse("ProviderInfoDto updated successfully"));
     }
 
     // Admin activates provider (sets isActive = true)
@@ -67,7 +67,7 @@ public class ProviderController {
     public ResponseEntity<?> activateProvider(@PathVariable Integer adminId,
                                               @PathVariable Integer providerId) {
         providerService.UpdateProviderStateByAdmin(adminId, providerId);
-        return ResponseEntity.ok(new ApiResponse("Provider activated successfully"));
+        return ResponseEntity.ok(new ApiResponse("ProviderInfoDto activated successfully"));
     }
 
     // ===================== DELETE =====================
@@ -76,7 +76,7 @@ public class ProviderController {
     @DeleteMapping("/delete/{providerId}")
     public ResponseEntity<?> deleteProvider(@PathVariable Integer providerId) {
         providerService.deleteProvider(providerId);
-        return ResponseEntity.ok(new ApiResponse("Provider deleted successfully"));
+        return ResponseEntity.ok(new ApiResponse("ProviderInfoDto deleted successfully"));
     }
 }
 

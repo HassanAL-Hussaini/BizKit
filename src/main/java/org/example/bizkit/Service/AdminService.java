@@ -2,12 +2,14 @@ package org.example.bizkit.Service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.bizkit.Api.ApiException;
+import org.example.bizkit.DTO.AdminInfoDto;
 import org.example.bizkit.Model.Admin;
 import org.example.bizkit.Repository.AdminRepository;
 
 import org.springframework.stereotype.Service;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -21,7 +23,12 @@ public class AdminService {
 //        if(!(superAdmin.getRole().equals("super admin"))) {
 //            throw new ApiException("super admin id is incorrect");
 //        } >> Canceled recording to the instructor advice
-        return adminRepository.findAll();
+        List<Admin> admins = adminRepository.findAll();
+        ArrayList<AdminInfoDto> adminsDtoList = new ArrayList<>();
+        for (Admin admin : admins) {
+            adminsDtoList.add(new AdminInfoDto(admin.getName(),admin.getEmail(),admin.getPhone()));
+        }
+        return adminsDtoList;
     }
 
     public void addAdmin( Admin admin) {
@@ -59,7 +66,7 @@ public class AdminService {
 //        } >> Canceled recording to the instructor advice
     }
 
-    public Admin getAdminByIdAndCheckIfExist(Integer id) {
+        protected Admin getAdminByIdAndCheckIfExist(Integer id) {
         Admin admin = adminRepository.findAdminById(id);
         if(admin==null){
             throw new ApiException("the Admin Not Found");

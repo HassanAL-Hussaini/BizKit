@@ -2,11 +2,13 @@ package org.example.bizkit.Service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.bizkit.Api.ApiException;
+import org.example.bizkit.DTO.ClientInfoDto;
 import org.example.bizkit.Model.Admin;
 import org.example.bizkit.Model.Client;
 import org.example.bizkit.Repository.ClientRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,17 +22,41 @@ public class ClientService {
     public List<?> getAllClients(Integer adminId) {
         // only admin can see the clients info
         adminService.getAdminByIdAndCheckIfExist(adminId);
-        return clientRepository.findAll();
+
+        List<Client> clients = clientRepository.findAll();
+        ArrayList<ClientInfoDto> clientsDtoList = new ArrayList<>();
+        for (Client client : clients) {
+            clientsDtoList.add(new ClientInfoDto(client.getName(),client.getEmail(),
+                                                 client.getPhone(),client.getCompanyName(),
+                                                 client.getAddress()));
+        }
+        return clientsDtoList;
     }
 
     public List<?> getActiveClients(Integer adminId) {
         adminService.getAdminByIdAndCheckIfExist(adminId);
-        return clientRepository.findAllByStatus("active");
+
+        List<Client> clients = clientRepository.findAllByStatus("active");
+        ArrayList<ClientInfoDto> clientsDtoList = new ArrayList<>();
+        for (Client client : clients) {
+            clientsDtoList.add(new ClientInfoDto(client.getName(),client.getEmail(),
+                    client.getPhone(),client.getCompanyName(),
+                    client.getAddress()));
+        }
+        return clientsDtoList;
     }
 
     public List<?> getUnactiveClients(Integer adminId) {
         adminService.getAdminByIdAndCheckIfExist(adminId);
-        return clientRepository.findAllByStatus("unactive");
+
+        List<Client> clients = clientRepository.findAllByStatus("unactive");
+        ArrayList<ClientInfoDto> clientsDtoList = new ArrayList<>();
+        for (Client client : clients) {
+            clientsDtoList.add(new ClientInfoDto(client.getName(),client.getEmail(),
+                    client.getPhone(),client.getCompanyName(),
+                    client.getAddress()));
+        }
+        return clientsDtoList;
     }
 
     // ===================== CREATE =====================
@@ -80,7 +106,7 @@ public class ClientService {
     }
 
     // ===================== INTERNAL HELPERS =====================
-    public Client getClientByIdAndCheckIfExist(Integer id) {
+    protected Client getClientByIdAndCheckIfExist(Integer id) {
         Client client = clientRepository.findClientById(id);
         if (client == null) {
             throw new ApiException("the Client Not Found");

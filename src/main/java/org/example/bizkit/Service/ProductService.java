@@ -2,12 +2,14 @@ package org.example.bizkit.Service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.bizkit.Api.ApiException;
+import org.example.bizkit.DTO.ProductInfoDto;
 import org.example.bizkit.Model.Product;
 import org.example.bizkit.Model.Provider;
 import org.example.bizkit.Repository.ProductRepository;
 import org.example.bizkit.Repository.ProviderRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,26 +22,44 @@ public class ProductService {
     // ===================== READ =====================
     // Get all products (public)
     public List<?> getAllProducts() {
-        return productRepository.findAll();
+        List<Product> products = productRepository.findAll();
+        ArrayList<ProductInfoDto>  productsDtoList = new ArrayList<>();
+        for (Product product : products) {
+            Provider provider = providerRepository.findProviderById(product.getProviderId());
+
+            productsDtoList.add(new ProductInfoDto( product.getName(),product.getDescription(),
+                                                    product.getPrice(),provider.getName(),
+                                                    product.getProviderId()));
+        }
+        return productsDtoList;
     }
     public List<?> getProductsByProviderId(Integer providerId) {
         //products for specfic company/provider\
         Provider provider = providerRepository.findProviderById(providerId);
         if(provider == null) {
-            throw new ApiException("Provider not found");
+            throw new ApiException("ProviderInfoDto not found");
         }
-        return productRepository.findProductsByProviderId(providerId);
+
+        List<Product> products = productRepository.findProductsByProviderId(providerId);
+        ArrayList<ProductInfoDto>  productsDtoList = new ArrayList<>();
+        for (Product product : products) {
+
+            productsDtoList.add(new ProductInfoDto( product.getName(),product.getDescription(),
+                    product.getPrice(),provider.getName(),
+                    product.getProviderId()));
+        }
+        return productsDtoList;
     }
     // ===================== CREATE =====================
     // Create a new product
     public void addProduct(Product product) {
         Provider provider = providerRepository.findProviderById(product.getProviderId());
-        //TODO you should use FK instead of doing relation manually
+        //Later you should use FK instead of doing relation manually
         if(provider == null) {
-            throw new ApiException("Provider not found");
+            throw new ApiException("ProviderInfoDto not found");
         }
         if(provider.getIsActive() ==  false) {
-            throw new ApiException("Provider not allowed to publish his products Contact technical support");
+            throw new ApiException("ProviderInfoDto not allowed to publish his products Contact technical support");
         }
         productRepository.save(product);
     }

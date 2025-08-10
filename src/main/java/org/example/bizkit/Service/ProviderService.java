@@ -2,12 +2,14 @@ package org.example.bizkit.Service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.bizkit.Api.ApiException;
+import org.example.bizkit.DTO.ProviderInfoDto;
 import org.example.bizkit.Model.Admin;
 import org.example.bizkit.Model.Provider;
 import org.example.bizkit.Repository.AdminRepository;
 import org.example.bizkit.Repository.ProviderRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -21,17 +23,40 @@ public class ProviderService {
     //=====================GET Services =====================
     public List<?> getAllProviders(Integer adminId) {
         adminService.getAdminByIdAndCheckIfExist(adminId);//this will never back if the admin id is not exist because it's contain throw statement on it.
-        return providerRepository.findAll();
+        List<Provider> providers = providerRepository.findAll();
+        ArrayList<ProviderInfoDto> providersDtoList =new ArrayList<>();
+        for (Provider provider : providers) {
+            providersDtoList.add(new ProviderInfoDto(provider.getName(),provider.getEmail(),
+                                                    provider.getPhone(),provider.getCompanyName(),
+                                                    provider.getAddress(),provider.getCommercialRegistrationNumber()));
+        }
+        return providersDtoList;
     }
 
     public List<?> getUnactiveProviders(Integer adminId) {
         adminService.getAdminByIdAndCheckIfExist(adminId);
-        return providerRepository.findProvidersByIsActiveIsFalse();
+
+        List<Provider> providers = providerRepository.findProvidersByIsActiveIsFalse();
+        ArrayList<ProviderInfoDto> providersDtoList =new ArrayList<>();
+        for (Provider provider : providers) {
+            providersDtoList.add(new ProviderInfoDto(provider.getName(),provider.getEmail(),
+                    provider.getPhone(),provider.getCompanyName(),
+                    provider.getAddress(),provider.getCommercialRegistrationNumber()));
+        }
+        return providersDtoList;
     }
 
     public List<?> getActiveProviders() {
         //any user can see the Providers
-        return providerRepository.findProvidersByIsActiveIsTrue();
+        List<Provider> providers =providerRepository.findProvidersByIsActiveIsTrue();
+        ArrayList<ProviderInfoDto> providersDtoList =new ArrayList<>();
+        for (Provider provider : providers) {
+            providersDtoList.add(new ProviderInfoDto(provider.getName(),provider.getEmail(),
+                    provider.getPhone(),provider.getCompanyName(),
+                    provider.getAddress(),provider.getCommercialRegistrationNumber()));
+        }
+        return providersDtoList;
+
     }
 
     //=====================POST Services =====================
@@ -82,7 +107,7 @@ public class ProviderService {
     protected Provider getProviderByIdAndCheckIfExist(Integer id) {
         Provider provider = providerRepository.findProviderById(id);
         if (provider == null) {
-            throw new ApiException("the Provider Not Found");
+            throw new ApiException("the ProviderInfoDto Not Found");
         }
         return provider;
     }

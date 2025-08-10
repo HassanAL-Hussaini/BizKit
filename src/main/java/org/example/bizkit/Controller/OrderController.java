@@ -39,7 +39,7 @@ public class OrderController {
         orderService.completeOrder(providerId, orderId);
         return ResponseEntity.ok(new ApiResponse("Order completed successfully"));
     }
-    // ==================Provider Rejects Order ==================
+    // ==================ProviderInfoDto Rejects Order ==================
     @PutMapping("/reject/{providerId}/{orderId}")
     public ResponseEntity<?> rejectOrderByProvider(@PathVariable Integer providerId,
                                                    @PathVariable Integer orderId) {

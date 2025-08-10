@@ -1,4 +1,5 @@
 package org.example.bizkit.Model;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -8,56 +9,58 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Check;
-
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-
 public class Provider {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Size(min = 3, max = 30)
-    @NotEmpty
+    @Size(min = 3, max = 30, message = "Name must be between 3 and 30 characters.")
+    @NotEmpty(message = "Name is required.")
     @Column(columnDefinition = "varchar(30) not null")
     private String name;
 
-    @NotEmpty
-    @Size(max = 30)
-    @Email
+    @NotEmpty(message = "Email is required.")
+    @Size(max = 30, message = "Email must be at most 30 characters.")
+    @Email(message = "Email must be a valid format.")
     @Column(columnDefinition = "varchar(30) not null unique")
     private String email;
 
-    @NotEmpty
+    @NotEmpty(message = "Password is required.")
     @Pattern(
             regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d).{8,}$",
-            message = "Password must be at least 8 characters long, contain an uppercase letter, a lowercase letter, and a digit"
+            message = "Password must be at least 8 characters and include an uppercase letter, a lowercase letter, and a digit."
     )
     @Column(columnDefinition = "varchar(30) not null")
     private String password;
 
-    @NotEmpty
-    @Size(min = 10, max = 10)
+    @NotEmpty(message = "Phone number is required.")
+    @Size(min = 10, max = 10, message = "Phone number must be exactly 10 characters.")
     @Column(columnDefinition = "varchar(10) not null unique")
     private String phone;
 
-    @NotEmpty
+    @NotEmpty(message = "Company name is required.")
     @Column(columnDefinition = "varchar(50) not null")
     private String companyName;
 
-    //TODO السجل الضريبي مهم
-    // i want to show it up in the invoice + make the invoice show up as PDF.
-    @NotEmpty
+    @NotEmpty(message = "Commercial Registration Number is required.")
+    @Column(nullable = false)
+    private String CommercialRegistrationNumber;
+
+    // Done: السجل الضريبي مهم - i want to show it up in the invoice.
+    //TODO :  make the invoice show up as PDF.
+    @NotEmpty(message = "Address is required.")
     @Column(columnDefinition = "varchar(100) not null")
     private String address;
 
-    //Admin just change the isActive variable to add the provider to the website.
+    // Admin just change the isActive variable to add the provider to the website.
     @Column(columnDefinition = "boolean not null")
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY) //user can't send this with json and make it true .
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY) // user can't send this with json and make it true.
     private Boolean isActive = false;
-    //any provider that is unactive the website will never show his products until the admin give him the access
+    // any provider that is unactive the website will never show his products until the admin give him the access
 }

@@ -2,13 +2,19 @@ package org.example.bizkit.Service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.bizkit.Api.ApiException;
+import org.example.bizkit.DTO.ReviewInfoDto;
+import org.example.bizkit.Model.Client;
 import org.example.bizkit.Model.Orders;
+import org.example.bizkit.Model.Product;
 import org.example.bizkit.Model.Review;
+import org.example.bizkit.Repository.ClientRepository;
 import org.example.bizkit.Repository.OrderRepository;
+import org.example.bizkit.Repository.ProductRepository;
 import org.example.bizkit.Repository.ReviewRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -19,39 +25,95 @@ public class ReviewService {
     private final ClientService clientService;
     private final OrderRepository orderRepository;   // avoid circular dependency by using repo instead of OrderService
     private final ProductService productService;
+    private final ClientRepository clientRepository;
+    private final ProductRepository productRepository;
 
     // ===================== READ (general) =====================
-    public List<Review> getAll() {
-        return reviewRepository.findAll();
+    public List<?> getAll() {
+        List<Review> reviews = reviewRepository.findAll();
+        ArrayList<ReviewInfoDto> reviewInfoDtos = new ArrayList<>();
+        for (Review review : reviews) {
+            Client client = clientRepository.findClientById(review.getClientId());
+            Product product = productRepository.findProductById(review.getProductId());
+            reviewInfoDtos.add(new ReviewInfoDto(client.getName(),product.getName(),
+                                                 review.getRating(), review.getComment(),
+                                                 review.getCreatedAt(),review.getUpdateAt()));
+        }
+        return reviewInfoDtos;
     }
 
-    public Review getReviewById(Integer id) {
-        return getReviewByIdAndCheckIfExist(id);
+    public ReviewInfoDto getReviewById(Integer id) {
+        Review review = getReviewByIdAndCheckIfExist(id);
+
+            Client client = clientRepository.findClientById(review.getClientId());
+            Product product = productRepository.findProductById(review.getProductId());
+            ReviewInfoDto reviewInfoDto =  new ReviewInfoDto(client.getName(),product.getName(),
+                    review.getRating(), review.getComment(),
+                    review.getCreatedAt(),review.getUpdateAt());
+
+        return reviewInfoDto;
     }
 
     // ===================== READ (repo methods exposed as services) =====================
-    public List<Review> getReviewsByClient(Integer clientId) {
+    public List<?> getReviewsByClient(Integer clientId) {
         clientService.getClientByIdAndCheckIfExist(clientId);
-        return reviewRepository.findReviewsByClientId(clientId);
+        List<Review> reviews = reviewRepository.findReviewsByClientId(clientId);
+        ArrayList<ReviewInfoDto> reviewInfoDtos = new ArrayList<>();
+        for (Review review : reviews) {
+            Client client = clientRepository.findClientById(review.getClientId());
+            Product product = productRepository.findProductById(review.getProductId());
+            reviewInfoDtos.add(new ReviewInfoDto(client.getName(),product.getName(),
+                    review.getRating(), review.getComment(),
+                    review.getCreatedAt(),review.getUpdateAt()));
+        }
+        return reviewInfoDtos;
     }
 
-    public Review getReviewsByOrder(Integer orderId) {
+    public List<ReviewInfoDto> getReviewsByOrder(Integer orderId) {
         Orders order = orderRepository.findOrdersById(orderId);
         if (order == null) throw new ApiException("Order not found");
-        return reviewRepository.findReviewsByOrderId(orderId);
+        List<Review> reviews = reviewRepository.findReviewsByOrderId(orderId);
+        ArrayList<ReviewInfoDto> reviewInfoDtos = new ArrayList<>();
+        for (Review review : reviews) {
+            Client client = clientRepository.findClientById(review.getClientId());
+            Product product = productRepository.findProductById(review.getProductId());
+            reviewInfoDtos.add(new ReviewInfoDto(client.getName(),product.getName(),
+                    review.getRating(), review.getComment(),
+                    review.getCreatedAt(),review.getUpdateAt()));
+        }
+        return reviewInfoDtos;
     }
 
-    public List<Review> getReviewsByProduct(Integer productId) {
+    public List<ReviewInfoDto> getReviewsByProduct(Integer productId) {
         productService.getProductByIdAndCheckIfExist(productId);
-        return reviewRepository.findReviewsByProductId(productId);
+
+        List<Review> reviews = reviewRepository.findReviewsByProductId(productId);
+        ArrayList<ReviewInfoDto> reviewInfoDtos = new ArrayList<>();
+        for (Review review : reviews) {
+            Client client = clientRepository.findClientById(review.getClientId());
+            Product product = productRepository.findProductById(review.getProductId());
+            reviewInfoDtos.add(new ReviewInfoDto(client.getName(),product.getName(),
+                    review.getRating(), review.getComment(),
+                    review.getCreatedAt(),review.getUpdateAt()));
+        }
+        return reviewInfoDtos;
     }
 
-    public List<Review> getReviewsByRatingAtLeast(Integer rating) {
+    public List<ReviewInfoDto> getReviewsByRatingAtLeast(Integer rating) {
         // adjust bounds if your rating scale is different
         if (rating == null || rating < 1 || rating > 5) {
             throw new ApiException("Rating must be between 1 and 5");
         }
-        return reviewRepository.retrieveReviewByRatingMoreThanOrEqual(rating);
+        List<Review> reviews = reviewRepository.retrieveReviewByRatingMoreThanOrEqual(rating);
+        ArrayList<ReviewInfoDto> reviewInfoDtos = new ArrayList<>();
+        for (Review review : reviews) {
+            Client client = clientRepository.findClientById(review.getClientId());
+            Product product = productRepository.findProductById(review.getProductId());
+            reviewInfoDtos.add(new ReviewInfoDto(client.getName(),product.getName(),
+                    review.getRating(), review.getComment(),
+                    review.getCreatedAt(),review.getUpdateAt()));
+        }
+        return reviewInfoDtos;
     }
 
     // ===================== CREATE =====================
@@ -68,6 +130,7 @@ public class ReviewService {
 
         // 3) validate product id on the review
         productService.getProductByIdAndCheckIfExist(review.getProductId());
+
 
         // 4) save review
         reviewRepository.save(review);

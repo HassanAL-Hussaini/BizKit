@@ -32,8 +32,6 @@ public class OrderService {
     private final InvoiceService invoiceService;
     private final NotificationService notificationService;
 
-
-
     //============ REQUEST ORDER ===================
     public void requestOrder(Integer clientId, Integer productId, Integer quantity) {
         // validate client
@@ -46,7 +44,7 @@ public class OrderService {
         Product product = productService.getProductByIdAndCheckIfExist(productId);
         Provider provider = providerService.getProviderByIdAndCheckIfExist(product.getProviderId());
         if (Boolean.FALSE.equals(provider.getIsActive())) {
-            throw new ApiException("Provider is not active");
+            throw new ApiException("ProviderInfoDto is not active");
         }
 
         // create order (pending)
@@ -108,9 +106,10 @@ public class OrderService {
         if (!orders.getClientId().equals(client.getId())) {
             throw new ApiException("Client is not owner of this order");
         }
-        if ("completed".equalsIgnoreCase(orders.getStatus())
+        if (       "completed".equalsIgnoreCase(orders.getStatus())
                 || "rejected".equalsIgnoreCase(orders.getStatus())
-                || "canceled".equalsIgnoreCase(orders.getStatus())) {
+                || "canceled".equalsIgnoreCase(orders.getStatus())
+                || "accepted".equalsIgnoreCase(orders.getStatus())){
             throw new ApiException("Order already finalized");
         }
 
@@ -143,12 +142,12 @@ public class OrderService {
     public void completeOrder(Integer providerId, Integer orderId) {
         Provider provider = providerService.getProviderByIdAndCheckIfExist(providerId);
         if (Boolean.FALSE.equals(provider.getIsActive())) {
-            throw new ApiException("Provider is not active");
+            throw new ApiException("ProviderInfoDto is not active");
         }
 
         Orders orders = getOrderByIdAndCheckIfExist(orderId);
         if (!orders.getProviderId().equals(provider.getId())) {
-            throw new ApiException("Provider is not owner of this order");
+            throw new ApiException("ProviderInfoDto is not owner of this order");
         }
         if (!"accepted".equalsIgnoreCase(orders.getStatus())) {
             throw new ApiException("Only accepted orders can be completed");
@@ -163,7 +162,7 @@ public class OrderService {
         // validate provider
         Provider provider = providerService.getProviderByIdAndCheckIfExist(providerId);
         if (Boolean.FALSE.equals(provider.getIsActive())) {
-            throw new ApiException("Provider is not active");
+            throw new ApiException("ProviderInfoDto is not active");
         }
 
         // validate order
@@ -171,7 +170,7 @@ public class OrderService {
 
         // ownership check
         if (!orders.getProviderId().equals(provider.getId())) {
-            throw new ApiException("Provider is not owner of this order");
+            throw new ApiException("ProviderInfoDto is not owner of this order");
         }
 
         // only non-finalized can be rejected
@@ -306,7 +305,7 @@ public class OrderService {
                 if (provider.getEmail() != null) {
                     String html = notificationService.buildOrderHtml(
                             "New Order #" + orders.getId() + " Pending",
-                            "Hello Provider : " + (provider.getName() != null ? provider.getName() : "Provider") + ",",
+                            "Hello ProviderInfoDto : " + (provider.getName() != null ? provider.getName() : "ProviderInfoDto") + ",",
                             "You have a new order <b>#"+orders.getId()+"</b> from client <b>#"+client.getId()+"</b>. Please review it.",
                             "View Order",
                             orderUrl,
@@ -357,7 +356,7 @@ public class OrderService {
                 if (provider.getEmail() != null) {
                     String html = notificationService.buildOrderHtml(
                             "Order #" + orders.getId() + " Canceled",
-                            "Hello Provider : " + (provider.getName() != null ? provider.getName() : "Provider") + ",",
+                            "Hello ProviderInfoDto : " + (provider.getName() != null ? provider.getName() : "ProviderInfoDto") + ",",
                             "Order <b>#"+orders.getId()+"</b> was <b>canceled</b> by client <b>#"+client.getId()+"</b>.",
                             "View Order",
                             orderUrl,

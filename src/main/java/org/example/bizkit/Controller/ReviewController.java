@@ -24,37 +24,37 @@ public class ReviewController {
 
     // Get all reviews
     @GetMapping("/get-all")
-    public ResponseEntity<List<Review>> getAll() {
+    public ResponseEntity<?> getAll() {
         return ResponseEntity.ok(reviewService.getAll());
     }
 
     // Get review by id
     @GetMapping("/get-by-id/{id}")
-    public ResponseEntity<Review> getById(@PathVariable Integer id) {
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
         return ResponseEntity.ok(reviewService.getReviewById(id));
     }
 
     // Get reviews by client id
     @GetMapping("/get-by-client/{clientId}")
-    public ResponseEntity<List<Review>> getByClient(@PathVariable Integer clientId) {
+    public ResponseEntity<?> getByClient(@PathVariable Integer clientId) {
         return ResponseEntity.ok(reviewService.getReviewsByClient(clientId));
     }
 
     // Get reviews by order id
     @GetMapping("/get-by-order/{orderId}")
-    public ResponseEntity<Review> getByOrder(@PathVariable Integer orderId) {
+    public ResponseEntity<?> getByOrder(@PathVariable Integer orderId) {
         return ResponseEntity.ok(reviewService.getReviewsByOrder(orderId));
     }
 
     // Get reviews by product id
     @GetMapping("/get-by-product/{productId}")
-    public ResponseEntity<List<Review>> getByProduct(@PathVariable Integer productId) {
+    public ResponseEntity<?> getByProduct(@PathVariable Integer productId) {
         return ResponseEntity.ok(reviewService.getReviewsByProduct(productId));
     }
 
     // Get reviews with rating >= min
     @GetMapping("/rating/{number}")
-    public ResponseEntity<List<Review>> getByRatingAtLeast(@PathVariable Integer number) {
+    public ResponseEntity<?> getByRatingAtLeast(@PathVariable Integer number) {
         return ResponseEntity.ok(reviewService.getReviewsByRatingAtLeast(number));
     }
 
