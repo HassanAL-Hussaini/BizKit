@@ -15,23 +15,23 @@ import java.util.List;
 public class AdminService {
     private final AdminRepository adminRepository;
 
-    public List<?>  getAllAdmins(Integer superAdminId) {
+    public List<?>  getAllAdmins() {
         //no one cant see the admins except the super admin.
-        Admin superAdmin = getAdminByIdAndCheckIfExist(superAdminId);
-        if(!(superAdmin.getRole().equals("super admin"))) {
-            throw new ApiException("super admin id is incorrect");
-        }
+//        Admin superAdmin = getAdminByIdAndCheckIfExist(superAdminId);
+//        if(!(superAdmin.getRole().equals("super admin"))) {
+//            throw new ApiException("super admin id is incorrect");
+//        } >> Canceled recording to the instructor advice
         return adminRepository.findAll();
     }
 
-    public void addAdmin(Integer superAdminId, Admin admin) {
-        Admin superAdmin = getAdminByIdAndCheckIfExist(superAdminId);
+    public void addAdmin( Admin admin) {
+//        Admin superAdmin = getAdminByIdAndCheckIfExist(superAdminId);
         //there is 2 Admin super and regular admin
         //the idea here is : the super admin can add regular admin but not vice versa
         //the super admin have been added to the database manually , in the system creation.
-        if(!(superAdmin.getRole().equals("super admin"))) {
-            throw new ApiException("Super Admin Not Found");
-        }
+//        if(!(superAdmin.getRole().equals("super admin"))) {
+//            throw new ApiException("Super Admin Not Found");
+//        } >> Canceled recording to the instructor advice
         adminRepository.save(admin);
     }
 
@@ -44,18 +44,19 @@ public class AdminService {
         adminRepository.save(oldAdmin);
     }
 
-    public void deleteAdmin(Integer superAdminId, Integer adminIdDeleted) {
+    public void deleteAdmin( Integer adminIdDeleted) {
         Admin adminDeleted = adminRepository.findAdminById(adminIdDeleted);
         if(adminDeleted==null){
             throw new ApiException("the Admin Not Found");
         }
-        Admin superAdmin = adminRepository.findAdminById(superAdminId);
-        if(superAdmin==null){
-            throw new ApiException("the Admin Not Found");
-        }
-        if(superAdmin.getRole().equals("super admin")) {
-            adminRepository.delete(adminDeleted);
-        }
+        adminRepository.deleteById(adminIdDeleted);
+//        Admin superAdmin = adminRepository.findAdminById(superAdminId);
+//        if(superAdmin==null){
+//            throw new ApiException("the Admin Not Found");
+//        }
+//        if(superAdmin.getRole().equals("super admin")) {
+//            adminRepository.delete(adminDeleted);
+//        } >> Canceled recording to the instructor advice
     }
 
     public Admin getAdminByIdAndCheckIfExist(Integer id) {

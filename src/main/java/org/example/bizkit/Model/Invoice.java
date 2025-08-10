@@ -30,7 +30,7 @@ public class Invoice {
 
     @UpdateTimestamp
     @Column(columnDefinition = "date")
-    //this will be Edited (dated) only if the invoice issued .
+    //Done this will be Edited (dated) only if the invoice issued .
     private LocalDate issuedDate;
 
     @CreationTimestamp

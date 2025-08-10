@@ -39,7 +39,7 @@ public class ProviderController {
     // ===================== POST =====================
 
     // provider self-registers then goes to waitlist until admin make the provider active after that he can show his products to clients
-    @PostMapping("/add/")
+    @PostMapping("/add")
     public ResponseEntity<?> addProvider( @Valid @RequestBody Provider provider,Errors errors) {
         if (errors.hasErrors()) {
             return ResponseEntity.badRequest().body(errors.getFieldError().getDefaultMessage());

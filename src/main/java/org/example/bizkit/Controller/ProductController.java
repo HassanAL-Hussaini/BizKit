@@ -30,6 +30,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.getProductsByProviderId(providerId));
     }
 
+    
 
     // ===================== CREATE =====================
     // Create a new product (provider must be active)

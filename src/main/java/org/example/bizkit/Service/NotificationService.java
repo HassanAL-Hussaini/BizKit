@@ -48,7 +48,7 @@ public class NotificationService {
 
     private final JavaMailSender mailSender;
 
-    /** نص بسيط */
+    /**simple text without HTML template*/
     public void sendSimpleEmail(String to, String subject, String text) {
         try {
             SimpleMailMessage msg = new SimpleMailMessage();

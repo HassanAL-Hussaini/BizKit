@@ -29,7 +29,10 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
     private final OrderItemService orderItemService;
     private final InvoiceRepository invoiceRepository;
+    private final InvoiceService invoiceService;
     private final NotificationService notificationService;
+
+
 
     //============ REQUEST ORDER ===================
     public void requestOrder(Integer clientId, Integer productId, Integer quantity) {
@@ -50,29 +53,24 @@ public class OrderService {
         Orders orders = new Orders();
         orders.setClientId(client.getId());
         orders.setProviderId(product.getProviderId());
-        orders.setTotalAmount(0.0);
+        orders.setProductId(productId);
+        orders.setTotalPrice(0.0);
         orders = orderRepository.save(orders);
 
         // pending + notify provider
         setStatusAndNotify(orders, "pending");
 
-        OrderItem orderItem = null;
-        Invoice invoice = null;
         boolean stockDecremented = false;
 
-        try {
             // stock check
             if (quantity <= 0 || quantity > product.getStockQuantity()) {
                 throw new ApiException("Quantity must be > 0 and <= available stock");
             }
 
             // create order item (snapshot price)
-            orderItem = new OrderItem();
-            orderItem.setOrderId(orders.getId());
-            orderItem.setProductId(product.getId());
-            orderItem.setQuantity(quantity);
-            orderItem.setPrice(product.getPrice()); // Double per your model/logs
-            orderItem = orderItemRepository.save(orderItem);
+            //Done separate it in orderItem Service
+            orderItemService.addOrderItem(orders.getId(),productId,quantity);
+            OrderItem orderItem = orderItemRepository.findOrderItemByOrderId(orders.getId());
 
             // decrement stock
             product.setStockQuantity(product.getStockQuantity() - quantity);
@@ -83,39 +81,17 @@ public class OrderService {
             Double total = product.getPrice() * quantity;
 
             // update order totals
-            orders.setTotalAmount(total);
+            orders.setTotalPrice(total);
             orderRepository.save(orders);
 
             // create & save invoice
-            invoice = new Invoice();
-            invoice.setOrderId(orders.getId());
-            invoice.setAmount(total);
-            invoice.setIssuedDate(LocalDate.now());
-            invoice.setDueDate(LocalDate.now().plusDays(7));
-            invoiceRepository.save(invoice);
+            //Done make the invoice come from the invoice service
+            invoiceService.addInvoice(orders.getId(),total);
+            Invoice invoice = invoiceRepository.findInvoiceByOrderId(orders.getId());
+
 
             // accepted + notify client
             setStatusAndNotify(orders, "accepted");
-
-        } catch (RuntimeException ex) {
-            // manual compensation
-            try {
-                if (stockDecremented) {
-                    product.setStockQuantity(product.getStockQuantity() + quantity);
-                    productRepository.save(product);
-                }
-                if (orderItem != null && orderItem.getId() != null) {
-                    orderItemRepository.deleteById(orderItem.getId());
-                }
-                if (invoice != null && invoice.getId() != null) {
-                    invoiceRepository.deleteById(invoice.getId());
-                }
-            } finally {
-                // mark order rejected + notify client
-                setStatusAndNotify(orders, "rejected");
-            }
-            throw ex;
-        }
     }
 
     //============ CANCEL ORDER By Client ===================
@@ -156,7 +132,7 @@ public class OrderService {
 
         // mark order canceled
         orders.setStatus("canceled");
-        orders.setTotalAmount(0.0);
+        orders.setTotalPrice(0.0);
         orderRepository.save(orders);
 
         // notify provider
@@ -223,7 +199,7 @@ public class OrderService {
             invoiceRepository.deleteById(invoice.getId());
         }
 
-        orders.setTotalAmount(0.0);
+        orders.setTotalPrice(0.0);
         orderRepository.save(orders);
 
         // rejected + notify client
@@ -280,7 +256,7 @@ public class OrderService {
 
         // update Amount (single item per order per تصميمك)
         double total = orderItem.getPrice() * orderItem.getQuantity();
-        order.setTotalAmount(total);
+        order.setTotalPrice(total);
         orderRepository.save(order);
 
         Invoice invoice = invoiceRepository.findInvoiceByOrderId(order.getId());
@@ -348,7 +324,7 @@ public class OrderService {
                     String html = notificationService.buildOrderHtml(
                             "Order #" + orders.getId() + " Accepted",
                             "Hello Client : " + (client.getName() != null ? client.getName() : "Client") + ",",
-                            "Your order <b>#"+orders.getId()+"</b> has been <b>accepted</b>. Total amount: <b>"+orders.getTotalAmount()+"</b>.",
+                            "Your order <b>#"+orders.getId()+"</b> has been <b>accepted</b>. Total amount: <b>"+orders.getTotalPrice()+"</b>.",
                             "View Order",
                             orderUrl,
                             "If you have any questions, just reply to this email."

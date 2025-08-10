@@ -2,11 +2,12 @@ package org.example.bizkit.Service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.bizkit.Api.ApiException;
-import org.example.bizkit.Model.Admin;
 import org.example.bizkit.Model.Invoice;
 import org.example.bizkit.Repository.InvoiceRepository;
+import org.example.bizkit.Repository.OrderRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -15,42 +16,49 @@ public class InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
     private final AdminService adminService;
+    // شلنا OrderService واستبدلناه بـ OrderRepository لو احتجت تحقق
+    private final OrderRepository orderRepository;
 
     // ===================== READ =====================
-    // Admin only - get all invoices
     public List<?> getAllInvoices(Integer adminId) {
         adminService.getAdminByIdAndCheckIfExist(adminId);
         return invoiceRepository.findAll();
     }
-    //Done get single invoice by invoice id
+
     public Invoice getInvoice(Integer invoiceId) {
-        Invoice invoice = getInvoiceByIdAndCheckIfExist(invoiceId);
-        return invoice;
+        return getInvoiceByIdAndCheckIfExist(invoiceId);
     }
 
     // ===================== CREATE =====================
-    //No create
+    public void addInvoice(Integer orderId, Double total) {
+        // (اختياري) تأكد إن الطلب موجود بدون استدعاء OrderService
+        if (!orderRepository.existsById(orderId)) {
+            throw new ApiException("Order not found");
+        }
+
+        Invoice invoice = new Invoice();
+        invoice.setOrderId(orderId);
+        invoice.setAmount(total);
+        invoice.setIssuedDate(LocalDate.now());
+        invoice.setDueDate(LocalDate.now().plusDays(7));
+        invoiceRepository.save(invoice);
+    }
 
     // ===================== UPDATE =====================
-    // Admin only - update invoice by id
     public void updateInvoice(Integer adminId, Integer invoiceIdUpdated, Invoice newInvoice) {
         adminService.getAdminByIdAndCheckIfExist(adminId);
         Invoice oldInvoice = getInvoiceByIdAndCheckIfExist(invoiceIdUpdated);
-        // adjust fields as per your Invoice model
+
+        // (اختياري) تحقّق من الطلب الجديد
+        if (!orderRepository.existsById(newInvoice.getOrderId())) {
+            throw new ApiException("Order not found for invoice update");
+        }
+
         oldInvoice.setOrderId(newInvoice.getOrderId());
         oldInvoice.setAmount(newInvoice.getAmount());
         oldInvoice.setIssuedDate(newInvoice.getIssuedDate());
         oldInvoice.setDueDate(newInvoice.getDueDate());
         invoiceRepository.save(oldInvoice);
-    }
-
-    // ===================== DELETE =====================
-    // Admin only - delete invoice by id
-    public void deleteInvoice(Integer adminId, Integer invoiceIdDeleted) {
-        adminService.getAdminByIdAndCheckIfExist(adminId);
-        Invoice invoice = invoiceRepository.findInvoiceById(invoiceIdDeleted);
-        if (invoice == null) throw new ApiException("Invoice Not Found");
-        invoiceRepository.delete(invoice);
     }
 
     // ===================== INTERNAL HELPERS =====================

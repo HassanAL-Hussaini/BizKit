@@ -17,21 +17,21 @@ import org.springframework.web.bind.annotation.*;
 public class AdminController {
     private final AdminService adminService;
 
-    @GetMapping("/get-all/{superAdminId}")
-    public ResponseEntity<?> getAllAdmins(@PathVariable Integer superAdminId) {
-        return ResponseEntity.ok(adminService.getAllAdmins(superAdminId));
+    @GetMapping("/get-all")
+    public ResponseEntity<?> getAllAdmins() {
+        return ResponseEntity.ok(adminService.getAllAdmins());
     }
-    @PostMapping("/add/{superAdminId}")
-    public ResponseEntity<?> addAdmin(@PathVariable Integer superAdminId,@Valid @RequestBody Admin admin , Errors errors) {
+    @PostMapping("/add")
+    public ResponseEntity<?> addAdmin(@Valid @RequestBody Admin admin , Errors errors) {
         if (errors.hasErrors()) {
             return ResponseEntity.badRequest().body(errors.getFieldError().getDefaultMessage());
         }
-        adminService.addAdmin(superAdminId, admin);
+        adminService.addAdmin(admin);
         return ResponseEntity.ok(new ApiResponse("added successfully"));
     }
-    @DeleteMapping("/delete/{superAdminId}/{adminId}")
-    public ResponseEntity<?> deleteAdmin(@PathVariable Integer superAdminId,@PathVariable Integer adminId) {
-        adminService.deleteAdmin(superAdminId,adminId);
+    @DeleteMapping("/delete/{adminId}")
+    public ResponseEntity<?> deleteAdmin(@PathVariable Integer adminId) {
+        adminService.deleteAdmin(adminId);
         return ResponseEntity.ok(new ApiResponse("delete successfully"));
     }
     @PutMapping("/update/{adminId}")

@@ -25,12 +25,6 @@ public class InvoiceController {
     // ===================== UPDATE =====================
     //No Update
 
-
     // ===================== DELETE =====================
-    @DeleteMapping("/delete/{adminId}/{invoiceId}")
-    public ResponseEntity<?> deleteInvoice(@PathVariable Integer adminId,
-                                           @PathVariable Integer invoiceId) {
-        invoiceService.deleteInvoice(adminId, invoiceId);
-        return ResponseEntity.ok(new ApiResponse("Invoice deleted successfully"));
-    }
+    //no Delete
 }

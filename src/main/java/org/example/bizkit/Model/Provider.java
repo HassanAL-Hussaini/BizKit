@@ -49,6 +49,8 @@ public class Provider {
     @Column(columnDefinition = "varchar(50) not null")
     private String companyName;
 
+    //TODO السجل الضريبي مهم
+    // i want to show it up in the invoice + make the invoice show up as PDF.
     @NotEmpty
     @Column(columnDefinition = "varchar(100) not null")
     private String address;
