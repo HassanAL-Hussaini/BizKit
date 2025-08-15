@@ -40,10 +40,8 @@ public class ClientController {
 
     // Public - register a new client
     @PostMapping("/add")
-    public ResponseEntity<?> addClient(@Valid @RequestBody Client client, Errors errors) {
-        if (errors.hasErrors()) {
-            return ResponseEntity.badRequest().body(errors.getFieldError().getDefaultMessage());
-        }
+    public ResponseEntity<?> addClient(@Valid @RequestBody Client client) {
+
         clientService.addClient(client);
         return ResponseEntity.status(201).body(new ApiResponse("Client added successfully"));
     }
@@ -69,11 +67,8 @@ public class ClientController {
     // Client - update own data (status not changed here)
     @PutMapping("/update/{clientId}")
     public ResponseEntity<?> updateClient(@PathVariable Integer clientId,
-                                          @Valid @RequestBody Client newClient,
-                                          Errors errors) {
-        if (errors.hasErrors()) {
-            return ResponseEntity.badRequest().body(errors.getFieldError().getDefaultMessage());
-        }
+                                          @Valid @RequestBody Client newClient) {
+
         clientService.updateClient(clientId, newClient);
         return ResponseEntity.ok(new ApiResponse("Client updated successfully"));
     }

@@ -40,10 +40,8 @@ public class ProviderController {
 
     // provider self-registers then goes to waitlist until admin make the provider active after that he can show his products to clients
     @PostMapping("/add")
-    public ResponseEntity<?> addProvider( @Valid @RequestBody Provider provider,Errors errors) {
-        if (errors.hasErrors()) {
-            return ResponseEntity.badRequest().body(errors.getFieldError().getDefaultMessage());
-        }
+    public ResponseEntity<?> addProvider( @Valid @RequestBody Provider provider) {
+
         providerService.addProvider( provider);
         return ResponseEntity.status(201).body(new ApiResponse("ProviderInfoDto added successfully (pending activation)"));
     }
@@ -53,11 +51,8 @@ public class ProviderController {
     // ProviderInfoDto updates own data
     @PutMapping("/update/{providerId}")
     public ResponseEntity<?> updateProvider(@PathVariable Integer providerId,
-                                            @Valid @RequestBody Provider newProvider,
-                                            Errors errors) {
-        if (errors.hasErrors()) {
-            return ResponseEntity.badRequest().body(errors.getFieldError().getDefaultMessage());
-        }
+                                            @Valid @RequestBody Provider newProvider) {
+
         providerService.updateProvider(providerId, newProvider);
         return ResponseEntity.ok(new ApiResponse("ProviderInfoDto updated successfully"));
     }

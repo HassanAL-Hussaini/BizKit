@@ -35,10 +35,7 @@ public class ProductController {
     // ===================== CREATE =====================
     // Create a new product (provider must be active)
     @PostMapping("/add")
-    public ResponseEntity<?> addProduct(@Valid @RequestBody Product product, Errors errors) {
-        if (errors.hasErrors()) {
-            return ResponseEntity.badRequest().body(errors.getFieldError().getDefaultMessage());
-        }
+    public ResponseEntity<?> addProduct(@Valid @RequestBody Product product) {
         productService.addProduct(product);
         return ResponseEntity.status(201).body(new ApiResponse("Product added successfully"));
     }
@@ -47,11 +44,8 @@ public class ProductController {
     // Update an existing product by id
     @PutMapping("/update/{productId}")
     public ResponseEntity<?> updateProduct(@PathVariable Integer productId,
-                                           @Valid @RequestBody Product newProduct,
-                                           Errors errors) {
-        if (errors.hasErrors()) {
-            return ResponseEntity.badRequest().body(errors.getFieldError().getDefaultMessage());
-        }
+                                           @Valid @RequestBody Product newProduct) {
+
         productService.updateProduct(productId, newProduct);
         return ResponseEntity.ok(new ApiResponse("Product updated successfully"));
     }

@@ -62,10 +62,8 @@ public class ReviewController {
 
     // Create a new review
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse> add(@Valid @RequestBody Review review , Errors errors) {
-        if(errors.hasErrors()){
-            throw new ApiException(errors.getFieldError().getDefaultMessage());
-        }
+    public ResponseEntity<ApiResponse> add(@Valid @RequestBody Review review ) {
+
         reviewService.addReview(review);
         // location is optional since service doesn't return the saved id
         return ResponseEntity.status(200).body(new ApiResponse("Review created successfully"));

@@ -5,8 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.bizkit.Api.ApiResponse;
 import org.example.bizkit.Model.Admin;
 import org.example.bizkit.Service.AdminService;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
@@ -35,10 +34,7 @@ public class AdminController {
         return ResponseEntity.ok(new ApiResponse("delete successfully"));
     }
     @PutMapping("/update/{adminId}")
-    public ResponseEntity<?> updateAdmin(@PathVariable Integer adminId, @Valid @RequestBody Admin admin ,   Errors errors ) {
-        if(errors.hasErrors()) {
-            return ResponseEntity.badRequest().body(errors.getFieldError().getDefaultMessage());
-        }
+    public ResponseEntity<?> updateAdmin(@PathVariable Integer adminId, @Valid @RequestBody Admin admin ) {
         adminService.updateAdmin(adminId,admin);
         return ResponseEntity.ok(new ApiResponse("updated successfully"));
     }
