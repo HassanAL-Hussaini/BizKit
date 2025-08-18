@@ -11,4 +11,5 @@ public class ClientInfoDto {
     private String phone;
     private String companyName;
     private String address;
+    private String recommendation;
 }

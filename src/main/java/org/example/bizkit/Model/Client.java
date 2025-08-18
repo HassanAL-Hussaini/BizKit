@@ -47,12 +47,18 @@ public class Client {
 
     @NotEmpty
     @Column(columnDefinition = "varchar(50) not null")
-    private String companyName;
+    private String companyName;//description
 
     @NotEmpty
     @Column(columnDefinition = "varchar(100) not null")
     private String address;
 
+    //Done For Ai Recommendation :
+    @Column(columnDefinition = "TEXT")
+    private String recommendation;
+
+
+    @NotEmpty
     //the idea here is : same as band or block , if the client dose somthing wrong I will make his state to unactive = Block/band
     @Pattern(regexp = "^(active|unactive)$", message = "Status must be Active Or unactive")
     @Column(columnDefinition = "varchar(20) not null")

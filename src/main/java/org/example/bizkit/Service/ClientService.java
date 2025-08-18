@@ -6,6 +6,7 @@ import org.example.bizkit.DTO.ClientInfoDto;
 import org.example.bizkit.Model.Admin;
 import org.example.bizkit.Model.Client;
 import org.example.bizkit.Repository.ClientRepository;
+import org.example.bizkit.Repository.ProviderRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,7 +18,8 @@ public class ClientService {
 
     private final ClientRepository clientRepository;
     private final AdminService adminService;
-
+    private final AiService aiService;
+    private final ProviderRepository providerRepository;
     // ===================== READ =====================
     public List<?> getAllClients(Integer adminId) {
         // only admin can see the clients info
@@ -26,9 +28,12 @@ public class ClientService {
         List<Client> clients = clientRepository.findAll();
         ArrayList<ClientInfoDto> clientsDtoList = new ArrayList<>();
         for (Client client : clients) {
-            clientsDtoList.add(new ClientInfoDto(client.getName(),client.getEmail(),
-                                                 client.getPhone(),client.getCompanyName(),
-                                                 client.getAddress()));
+            clientsDtoList.add(new ClientInfoDto(client.getName(),
+                                                 client.getEmail(),
+                                                 client.getPhone(),
+                                                 client.getCompanyName(),
+                                                 client.getAddress(),
+                                                 client.getRecommendation()));
         }
         return clientsDtoList;
     }
@@ -41,7 +46,8 @@ public class ClientService {
         for (Client client : clients) {
             clientsDtoList.add(new ClientInfoDto(client.getName(),client.getEmail(),
                     client.getPhone(),client.getCompanyName(),
-                    client.getAddress()));
+                    client.getAddress(),
+                    client.getRecommendation()));
         }
         return clientsDtoList;
     }
@@ -54,7 +60,8 @@ public class ClientService {
         for (Client client : clients) {
             clientsDtoList.add(new ClientInfoDto(client.getName(),client.getEmail(),
                     client.getPhone(),client.getCompanyName(),
-                    client.getAddress()));
+                    client.getAddress(),
+                    client.getRecommendation()));
         }
         return clientsDtoList;
     }
@@ -62,7 +69,29 @@ public class ClientService {
     // ===================== CREATE =====================
     public void addClient(Client client) {
         // any Company can register to the website as a client = customer
+
         clientRepository.save(client);
+        //Done AI
+        String prompt = """
+                Based on the company name %s that client have
+                Provide a full learning path and recommendations for this person to what Provider from this list of provider %s should he deal with.
+                give him advice of what provider they need, make sure to said at the beginning:
+                this advice from AI and Depend on the Company Name...(rest of recommendations)
+                """.formatted(
+                        client.getCompanyName(),
+                        providerRepository.findAll()
+        );
+
+
+        String chatRes = aiService.chat(prompt);
+        //TODO add the response detail to the client Recommendation.
+        if(chatRes != null ) {
+            client.setRecommendation(chatRes);
+        }else{
+            client.setRecommendation("no Response from AI");
+        }
+        clientRepository.save(client);
+        System.out.println(chatRes);
     }
 
     // ===================== UPDATE =====================

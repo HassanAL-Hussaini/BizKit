@@ -54,14 +54,14 @@ public class GlobalExceptionHandler {
     // Database Constraint Exception
     @ExceptionHandler(value = DataIntegrityViolationException.class)
     public ResponseEntity<ApiResponse> DataIntegrityViolationException(DataIntegrityViolationException e){
-        String msg=e.getMessage();
+        String msg=e.getMessage() ;
         return ResponseEntity.status(400).body(new ApiResponse(msg));
     }
 
-    // Method not allowed Exception
+//     Method not allowed Exception
     @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ApiResponse> HttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
-        String msg = e.getMessage();
+        String msg = e.getMessage()+ " Error Type: "+ e.getClass().getSimpleName();
         return ResponseEntity.status(400).body(new ApiResponse(msg));
     }
 
