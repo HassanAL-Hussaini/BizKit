@@ -19,5 +19,6 @@ public class AiService {
                 .prompt(prompt)
                 .call()
                 .content();
+
     }
 }
